@@ -2,53 +2,139 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  ArrowLeftIcon,
+import {
   CreditCardIcon,
-  BanknoteIcon,
   DollarSignIcon,
+  BanknoteIcon,
   BuildingIcon,
-  UserIcon,
-  CheckIcon,
-  XIcon,
-  LockIcon,
-  CalendarIcon,
-  PrinterIcon,
-  MailIcon,
-  DownloadIcon,
-  ClockIcon,
-  AlertCircleIcon,
   ShieldCheckIcon,
-  RefreshCwIcon
+  RefreshCwIcon,
+  CheckIcon,
+  ArrowLeftIcon,
+  UserIcon,
+  LockIcon,
+  Building2,
+  Pill,
+  Stethoscope,
+  ShoppingCart,
+  Package,
+  Heart,
+  Activity,
+  FileText,
+  Calendar,
+  Filter,
+  Search
 } from 'lucide-react';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/shared/header';
+import Footer from '@/components/shared/footer';
 
-import { Sidebar } from '../../components/layout/sidebar';
-import { Header } from '../../components/shared/header';
-import Footer from '../../components/shared/footer';
-
-// Mock data for outstanding invoices
+// ---------- Mock Data ----------
 const mockOutstandingInvoices = [
+  // Hospital Billing
   {
-    id: 'INV-2024-001',
+    id: 'HSP-2024-001',
     patientName: 'John Smith',
-    amount: 234.00,
+    patientId: 'PAT001',
+    amount: 234.0,
     dueDate: '2024-12-01',
-    description: 'Office Visit & Lab Work'
+    description: 'Office Visit & Lab Work',
+    type: 'hospital',
+    category: 'OPD',
+    department: 'General Medicine',
+    physician: 'Dr. Anderson',
+    services: ['Consultation', 'Blood Test', 'ECG']
   },
   {
-    id: 'INV-2024-002',
+    id: 'HSP-2024-002',
     patientName: 'Sarah Johnson',
-    amount: 1085.00,
+    patientId: 'PAT002',
+    amount: 1085.0,
     dueDate: '2024-11-27',
     description: 'Emergency Department Visit',
-    isOverdue: true
+    type: 'hospital',
+    category: 'Emergency',
+    department: 'Emergency Medicine',
+    physician: 'Dr. Roberts',
+    isOverdue: true,
+    services: ['Emergency Consultation', 'X-Ray', 'CT Scan']
   },
   {
-    id: 'INV-2024-003',
+    id: 'HSP-2024-003',
     patientName: 'Michael Brown',
-    amount: 450.00,
+    patientId: 'PAT003',
+    amount: 450.0,
     dueDate: '2024-12-15',
-    description: 'Cardiology Consultation'
+    description: 'Cardiology Consultation',
+    type: 'hospital',
+    category: 'OPD',
+    department: 'Cardiology',
+    physician: 'Dr. Martinez',
+    services: ['Cardiology Consultation', 'Echo Test']
+  },
+  {
+    id: 'PKG-2024-001',
+    patientName: 'Emma Davis',
+    patientId: 'PAT004',
+    amount: 6800.0,
+    dueDate: '2024-12-20',
+    description: 'Complete Maternity Package',
+    type: 'hospital',
+    category: 'Package',
+    department: 'Maternity',
+    physician: 'Dr. Wilson',
+    services: ['Prenatal Care', 'Delivery', 'Postpartum Care']
+  },
+  // Pharmacy/POS Billing
+  {
+    id: 'POS-2024-001',
+    patientName: 'David Wilson',
+    patientId: 'PAT005',
+    amount: 89.50,
+    dueDate: '2024-11-30',
+    description: 'Prescription Medications',
+    type: 'pharmacy',
+    category: 'Prescription',
+    pharmacist: 'PharmD Jones',
+    items: [
+      { name: 'Amoxicillin 500mg', qty: 21, price: 25.00 },
+      { name: 'Lisinopril 10mg', qty: 30, price: 35.50 },
+      { name: 'Vitamin D3', qty: 60, price: 29.00 }
+    ]
+  },
+  {
+    id: 'POS-2024-002',
+    patientName: 'Lisa Chen',
+    patientId: 'PAT006',
+    amount: 156.75,
+    dueDate: '2024-12-05',
+    description: 'Medical Supplies & OTC',
+    type: 'pharmacy',
+    category: 'Retail',
+    pharmacist: 'PharmD Smith',
+    items: [
+      { name: 'Blood Pressure Monitor', qty: 1, price: 89.99 },
+      { name: 'Thermometer Digital', qty: 2, price: 15.99 },
+      { name: 'First Aid Kit', qty: 1, price: 34.77 }
+    ]
+  },
+  {
+    id: 'POS-2024-003',
+    patientName: 'Robert Taylor',
+    patientId: 'PAT007',
+    amount: 267.30,
+    dueDate: '2024-12-10',
+    description: 'Chronic Care Medications',
+    type: 'pharmacy',
+    category: 'Prescription',
+    pharmacist: 'PharmD Brown',
+    isOverdue: false,
+    items: [
+      { name: 'Metformin 1000mg', qty: 90, price: 45.00 },
+      { name: 'Atorvastatin 20mg', qty: 30, price: 67.50 },
+      { name: 'Aspirin 81mg', qty: 100, price: 12.80 },
+      { name: 'Insulin Glargine', qty: 1, price: 142.00 }
+    ]
   }
 ];
 
@@ -56,29 +142,17 @@ interface PaymentFormData {
   invoiceId: string;
   amount: number;
   paymentMethod: string;
-  
-  // Credit/Debit Card fields
   cardNumber: string;
   expiryDate: string;
   cvv: string;
   cardholderName: string;
-  
-  // Check fields
   checkNumber: string;
   bankName: string;
-  
-  // Bank Transfer fields
   accountNumber: string;
   routingNumber: string;
-  
-  // Cash fields
   receivedBy: string;
-  
-  // Insurance fields
   insuranceProvider: string;
   authorizationNumber: string;
-  
-  // Common fields
   notes: string;
 }
 
@@ -90,9 +164,60 @@ interface PaymentResult {
   message: string;
 }
 
+// ---------- POS Method Button ----------
+function POSMethodButton({
+  icon: Icon,
+  label,
+  method,
+  active,
+  onSelect,
+}: {
+  icon: any;
+  label: string;
+  method: string;
+  active?: boolean;
+  onSelect: (method: string) => void;
+}) {
+  return (
+    <button
+      onClick={() => onSelect(method)}
+      className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all
+      ${
+        active
+          ? 'bg-blue-600 text-white border-blue-600'
+          : 'bg-gray-50 text-gray-700 border-gray-300 hover:border-gray-400'
+      }`}
+    >
+      <Icon className="h-6 w-6 mb-1" />
+      <span className="text-sm font-medium">{label}</span>
+    </button>
+  );
+}
+
+// ---------- POS Keypad ----------
+function POSKeypad({ onInput }: { onInput: (val: string) => void }) {
+  const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0', '.', '←'];
+  return (
+    <div className="grid grid-cols-3 gap-3 mt-4">
+      {keys.map((k) => (
+        <button
+          key={k}
+          onClick={() => onInput(k)}
+          className="p-4 bg-gray-100 hover:bg-gray-200 rounded-lg text-xl font-semibold"
+        >
+          {k}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ---------- Main POS Component ----------
 export default function PaymentProcessing() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [invoiceFilter, setInvoiceFilter] = useState('all'); // 'all', 'hospital', 'pharmacy'
+  const [searchTerm, setSearchTerm] = useState('');
   const [paymentData, setPaymentData] = useState<PaymentFormData>({
     invoiceId: '',
     amount: 0,
@@ -108,135 +233,74 @@ export default function PaymentProcessing() {
     receivedBy: '',
     insuranceProvider: '',
     authorizationNumber: '',
-    notes: ''
+    notes: '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showReceipt, setShowReceipt] = useState(false);
+  const [amountInput, setAmountInput] = useState('');
+
+  // Filter invoices based on type and search
+  const filteredInvoices = mockOutstandingInvoices.filter(invoice => {
+    const matchesFilter = invoiceFilter === 'all' || invoice.type === invoiceFilter;
+    const matchesSearch = invoice.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  const getInvoiceIcon = (invoice: any) => {
+    if (invoice.type === 'hospital') {
+      if (invoice.category === 'Package') return Heart;
+      if (invoice.category === 'Emergency') return Activity;
+      return Stethoscope;
+    }
+    return invoice.category === 'Prescription' ? Pill : ShoppingCart;
+  };
+
+  const getInvoiceTypeColor = (invoice: any) => {
+    if (invoice.type === 'hospital') {
+      return invoice.category === 'Emergency' ? 'text-red-600' : 'text-blue-600';
+    }
+    return 'text-green-600';
+  };
 
   useEffect(() => {
     if (selectedInvoice) {
-      setPaymentData(prev => ({
+      setPaymentData((prev) => ({
         ...prev,
         invoiceId: selectedInvoice.id,
-        amount: selectedInvoice.amount
+        amount: selectedInvoice.amount,
       }));
+      setAmountInput(selectedInvoice.amount.toFixed(2));
     }
   }, [selectedInvoice]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!selectedInvoice) {
-      newErrors.invoice = 'Please select an invoice to pay';
+  const handleKeypadInput = (val: string) => {
+    if (val === '←') {
+      setAmountInput((prev) => prev.slice(0, -1));
+    } else {
+      setAmountInput((prev) => prev + val);
     }
-
-    if (!paymentData.amount || paymentData.amount <= 0) {
-      newErrors.amount = 'Please enter a valid payment amount';
-    }
-
-    if (paymentData.amount > selectedInvoice?.amount) {
-      newErrors.amount = 'Payment amount cannot exceed invoice balance';
-    }
-
-    // Payment method specific validation
-    switch (paymentData.paymentMethod) {
-      case 'credit_card':
-      case 'debit_card':
-        if (!paymentData.cardNumber.replace(/\s/g, '').match(/^\d{16}$/)) {
-          newErrors.cardNumber = 'Please enter a valid 16-digit card number';
-        }
-        if (!paymentData.expiryDate.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
-          newErrors.expiryDate = 'Please enter expiry date in MM/YY format';
-        }
-        if (!paymentData.cvv.match(/^\d{3,4}$/)) {
-          newErrors.cvv = 'Please enter a valid CVV';
-        }
-        if (!paymentData.cardholderName.trim()) {
-          newErrors.cardholderName = 'Cardholder name is required';
-        }
-        break;
-      case 'check':
-        if (!paymentData.checkNumber.trim()) {
-          newErrors.checkNumber = 'Check number is required';
-        }
-        if (!paymentData.bankName.trim()) {
-          newErrors.bankName = 'Bank name is required';
-        }
-        break;
-      case 'bank_transfer':
-        if (!paymentData.accountNumber.trim()) {
-          newErrors.accountNumber = 'Account number is required';
-        }
-        if (!paymentData.routingNumber.match(/^\d{9}$/)) {
-          newErrors.routingNumber = 'Please enter a valid 9-digit routing number';
-        }
-        break;
-      case 'cash':
-        if (!paymentData.receivedBy.trim()) {
-          newErrors.receivedBy = 'Please specify who received the payment';
-        }
-        break;
-      case 'insurance':
-        if (!paymentData.insuranceProvider.trim()) {
-          newErrors.insuranceProvider = 'Insurance provider is required';
-        }
-        if (!paymentData.authorizationNumber.trim()) {
-          newErrors.authorizationNumber = 'Authorization number is required';
-        }
-        break;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const num = parseFloat(amountInput + val);
+    setPaymentData((prev) => ({ ...prev, amount: isNaN(num) ? 0 : num }));
   };
 
   const processPayment = async () => {
-    if (!validateForm()) return;
-
+    if (!selectedInvoice) {
+      alert('Select an invoice first.');
+      return;
+    }
     setIsProcessing(true);
-    
-    // Simulate payment processing
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const result: PaymentResult = {
-        success: true,
-        transactionId: `TXN${Date.now()}`,
-        receiptNumber: `RCP${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        message: 'Payment processed successfully'
-      };
-      
-      setPaymentResult(result);
-      setShowReceipt(true);
-    } catch (error) {
-      setPaymentResult({
-        success: false,
-        transactionId: '',
-        receiptNumber: '',
-        timestamp: new Date().toISOString(),
-        message: 'Payment processing failed. Please try again.'
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return v;
-    }
+    await new Promise((r) => setTimeout(r, 1500));
+    setPaymentResult({
+      success: true,
+      transactionId: `TXN${Date.now()}`,
+      receiptNumber: `RCP${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      message: 'Payment successful',
+    });
+    setIsProcessing(false);
   };
 
   const resetForm = () => {
@@ -256,545 +320,423 @@ export default function PaymentProcessing() {
       receivedBy: '',
       insuranceProvider: '',
       authorizationNumber: '',
-      notes: ''
+      notes: '',
     });
     setPaymentResult(null);
-    setShowReceipt(false);
-    setErrors({});
+    setAmountInput('');
   };
 
-  const printReceipt = () => {
-    window.print();
-  };
-
-  const emailReceipt = () => {
-    alert('Receipt emailed successfully!');
-  };
-
-  if (showReceipt && paymentResult) {
+  // ---------- Success Screen ----------
+  if (paymentResult?.success) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <CheckIcon className="h-8 w-8 text-green-600" />
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Payment Successful</h1>
-                    <p className="text-sm text-gray-600">Transaction completed successfully</p>
-                  </div>
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={printReceipt}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <PrinterIcon className="h-4 w-4" />
-                    <span>Print</span>
-                  </button>
-                  <button
-                    onClick={emailReceipt}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <MailIcon className="h-4 w-4" />
-                    <span>Email Receipt</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Receipt */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Payment Receipt</h2>
-              <p className="text-sm text-gray-600 mt-2">Receipt #{paymentResult.receiptNumber}</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Transaction ID:</span>
-                    <span className="text-sm font-medium">{paymentResult.transactionId}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Date & Time:</span>
-                    <span className="text-sm font-medium">
-                      {new Date(paymentResult.timestamp).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Payment Method:</span>
-                    <span className="text-sm font-medium">
-                      {paymentData.paymentMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Amount Paid:</span>
-                    <span className="text-lg font-bold text-green-600">${paymentData.amount.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Invoice Details</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Invoice ID:</span>
-                    <span className="text-sm font-medium">{selectedInvoice?.id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Patient:</span>
-                    <span className="text-sm font-medium">{selectedInvoice?.patientName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Description:</span>
-                    <span className="text-sm font-medium">{selectedInvoice?.description}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Due Date:</span>
-                    <span className="text-sm font-medium">
-                      {selectedInvoice && new Date(selectedInvoice.dueDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {paymentData.notes && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes</h3>
-                <p className="text-sm text-gray-700">{paymentData.notes}</p>
-              </div>
-            )}
-
-            <div className="border-t border-gray-200 pt-6 text-center">
-              <p className="text-sm text-gray-600 mb-4">Thank you for your payment!</p>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={resetForm}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200"
-                >
-                  Process Another Payment
-                </button>
-                <Link
-                  href="/invoices"
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200"
-                >
-                  Return to Invoices
-                </Link>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-white text-center">
+        <CheckIcon className="h-16 w-16 text-green-600 mb-4" />
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful</h1>
+        <p className="text-gray-600 mb-8">
+          Transaction #{paymentResult.transactionId} • Receipt #{paymentResult.receiptNumber}
+        </p>
+        <div className="flex space-x-4">
+          <button
+            onClick={resetForm}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold"
+          >
+            Process Another Payment
+          </button>
+          <Link
+            href="/invoices"
+            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 font-semibold"
+          >
+            Return to Invoices
+          </Link>
         </div>
       </div>
     );
   }
 
+  // ---------- POS UI ----------
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+    <div className="min-h-screen flex bg-gray-100">
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       <Header sidebarCollapsed={sidebarCollapsed} />
-      <div className={`transition-all duration-300 pt-20 ${sidebarCollapsed ? 'ml-14' : 'ml-56'}`}>
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-6">
-              <div className="flex items-center space-x-4">
-                <Link href="/invoices" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                  <ArrowLeftIcon className="h-6 w-6" />
-                </Link>
-                <div className="flex items-center space-x-3">
-                  <CreditCardIcon className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Payment Processing</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Process patient payments securely</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Invoice Selection */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Invoice to Pay</h3>
-            
-            {errors.invoice && <p className="text-red-500 text-sm mb-4">{errors.invoice}</p>}
-            
-            <div className="space-y-3">
-              {mockOutstandingInvoices.map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-colors duration-200 ${
-                    selectedInvoice?.id === invoice.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  } ${invoice.isOverdue ? 'border-red-200 bg-red-50' : ''}`}
-                  onClick={() => setSelectedInvoice(invoice)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-sm font-medium text-blue-600">{invoice.id}</span>
-                        {invoice.isOverdue && (
-                          <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                            Overdue
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-900 font-medium">{invoice.patientName}</p>
-                      <p className="text-sm text-gray-600">{invoice.description}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Due: {new Date(invoice.dueDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900">${invoice.amount.toFixed(2)}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className={`flex flex-1 transition-all duration-300 pt-16 ${sidebarCollapsed ? 'ml-14' : 'ml-56'}`}>
+        {/* LEFT PANEL */}
+        <aside className="w-1/3 bg-white border-r p-4 overflow-y-auto shadow-md">
+          <div className="flex items-center mb-4 justify-between">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" /> Pending Invoices
+            </h2>
+            <span className="text-sm text-gray-500">{filteredInvoices.length} invoices</span>
           </div>
 
-          {/* Payment Form */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Payment Information</h3>
-            
-            {/* Payment Amount */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Amount
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-3 text-gray-500">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max={selectedInvoice?.amount || 0}
-                  className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.amount ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  value={paymentData.amount || ''}
-                  onChange={(e) => setPaymentData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                  disabled={!selectedInvoice}
-                />
-              </div>
-              {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
-              {selectedInvoice && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Maximum: ${selectedInvoice.amount.toFixed(2)}
-                </p>
-              )}
-            </div>
-
-            {/* Payment Method Selection */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Payment Method
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: 'credit_card', label: 'Credit Card', icon: CreditCardIcon },
-                  { value: 'debit_card', label: 'Debit Card', icon: CreditCardIcon },
-                  { value: 'check', label: 'Check', icon: BanknoteIcon },
-                  { value: 'cash', label: 'Cash', icon: DollarSignIcon },
-                  { value: 'bank_transfer', label: 'Bank Transfer', icon: BuildingIcon },
-                  { value: 'insurance', label: 'Insurance', icon: ShieldCheckIcon }
-                ].map((method) => (
-                  <button
-                    key={method.value}
-                    type="button"
-                    className={`flex items-center space-x-2 p-3 border rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      paymentData.paymentMethod === method.value
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
-                    onClick={() => setPaymentData(prev => ({ ...prev, paymentMethod: method.value }))}
-                  >
-                    <method.icon className="h-4 w-4" />
-                    <span>{method.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Payment Method Specific Fields */}
-            {(paymentData.paymentMethod === 'credit_card' || paymentData.paymentMethod === 'debit_card') && (
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Card Number
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={19}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.cardNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="1234 5678 9012 3456"
-                    value={paymentData.cardNumber}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, cardNumber: formatCardNumber(e.target.value) }))}
-                  />
-                  {errors.cardNumber && <p className="text-red-500 text-sm mt-1">{errors.cardNumber}</p>}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Expiry Date
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      maxLength={5}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.expiryDate ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      value={paymentData.expiryDate}
-                      onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        if (value.length >= 2) {
-                          value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                        }
-                        setPaymentData(prev => ({ ...prev, expiryDate: value }));
-                      }}
-                    />
-                    {errors.expiryDate && <p className="text-red-500 text-sm mt-1">{errors.expiryDate}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={4}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.cvv ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="123"
-                      value={paymentData.cvv}
-                      onChange={(e) => setPaymentData(prev => ({ ...prev, cvv: e.target.value.replace(/\D/g, '') }))}
-                    />
-                    {errors.cvv && <p className="text-red-500 text-sm mt-1">{errors.cvv}</p>}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cardholder Name
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.cardholderName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="John Doe"
-                    value={paymentData.cardholderName}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, cardholderName: e.target.value }))}
-                  />
-                  {errors.cardholderName && <p className="text-red-500 text-sm mt-1">{errors.cardholderName}</p>}
-                </div>
-              </div>
-            )}
-
-            {paymentData.paymentMethod === 'check' && (
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Check Number
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.checkNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="1001"
-                    value={paymentData.checkNumber}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, checkNumber: e.target.value }))}
-                  />
-                  {errors.checkNumber && <p className="text-red-500 text-sm mt-1">{errors.checkNumber}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bank Name
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.bankName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="First National Bank"
-                    value={paymentData.bankName}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, bankName: e.target.value }))}
-                  />
-                  {errors.bankName && <p className="text-red-500 text-sm mt-1">{errors.bankName}</p>}
-                </div>
-              </div>
-            )}
-
-            {paymentData.paymentMethod === 'bank_transfer' && (
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Account Number
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.accountNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="1234567890"
-                    value={paymentData.accountNumber}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, accountNumber: e.target.value }))}
-                  />
-                  {errors.accountNumber && <p className="text-red-500 text-sm mt-1">{errors.accountNumber}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Routing Number
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={9}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.routingNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="123456789"
-                    value={paymentData.routingNumber}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, routingNumber: e.target.value.replace(/\D/g, '') }))}
-                  />
-                  {errors.routingNumber && <p className="text-red-500 text-sm mt-1">{errors.routingNumber}</p>}
-                </div>
-              </div>
-            )}
-
-            {paymentData.paymentMethod === 'cash' && (
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Received By
-                </label>
-                <input
-                  type="text"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.receivedBy ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Staff member name"
-                  value={paymentData.receivedBy}
-                  onChange={(e) => setPaymentData(prev => ({ ...prev, receivedBy: e.target.value }))}
-                />
-                {errors.receivedBy && <p className="text-red-500 text-sm mt-1">{errors.receivedBy}</p>}
-              </div>
-            )}
-
-            {paymentData.paymentMethod === 'insurance' && (
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Insurance Provider
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.insuranceProvider ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Blue Cross Blue Shield"
-                    value={paymentData.insuranceProvider}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, insuranceProvider: e.target.value }))}
-                  />
-                  {errors.insuranceProvider && <p className="text-red-500 text-sm mt-1">{errors.insuranceProvider}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Authorization Number
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.authorizationNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="AUTH123456789"
-                    value={paymentData.authorizationNumber}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, authorizationNumber: e.target.value }))}
-                  />
-                  {errors.authorizationNumber && <p className="text-red-500 text-sm mt-1">{errors.authorizationNumber}</p>}
-                </div>
-              </div>
-            )}
-
-            {/* Notes */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Notes (Optional)
-              </label>
-              <textarea
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Additional payment notes or comments..."
-                value={paymentData.notes}
-                onChange={(e) => setPaymentData(prev => ({ ...prev, notes: e.target.value }))}
+          {/* Search and Filter */}
+          <div className="space-y-3 mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search invoices..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setInvoiceFilter('all')}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
+                  invoiceFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setInvoiceFilter('hospital')}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+                  invoiceFilter === 'hospital' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Stethoscope className="h-3 w-3" /> Hospital
+              </button>
+              <button
+                onClick={() => setInvoiceFilter('pharmacy')}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+                  invoiceFilter === 'pharmacy' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Pill className="h-3 w-3" /> Pharmacy
+              </button>
+            </div>
+          </div>
 
-            {/* Security Notice */}
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <LockIcon className="h-5 w-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Secure Payment Processing</span>
+          {/* Invoice List */}
+          {filteredInvoices.map((invoice) => {
+            const IconComponent = getInvoiceIcon(invoice);
+            return (
+              <div
+                key={invoice.id}
+                onClick={() => setSelectedInvoice(invoice)}
+                className={`p-4 mb-3 rounded-lg border cursor-pointer transition-all ${
+                  selectedInvoice?.id === invoice.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:bg-gray-50'
+                } ${
+                  invoice.isOverdue ? 'border-l-4 border-l-red-500' : ''
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <IconComponent className={`h-4 w-4 ${getInvoiceTypeColor(invoice)}`} />
+                      <p className="font-semibold text-gray-800 text-sm">{invoice.patientName}</p>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        invoice.type === 'hospital' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {invoice.type === 'hospital' ? invoice.category : 'Pharmacy'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-1">{invoice.id} • {invoice.patientId}</p>
+                    <p className="text-sm text-gray-500">{invoice.description}</p>
+                    {invoice.type === 'hospital' && invoice.physician && (
+                      <p className="text-xs text-gray-400">👨‍⚕️ {invoice.physician}</p>
+                    )}
+                    {invoice.type === 'pharmacy' && invoice.pharmacist && (
+                      <p className="text-xs text-gray-400">💊 {invoice.pharmacist}</p>
+                    )}
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-gray-400">
+                        Due {new Date(invoice.dueDate).toLocaleDateString()}
+                        {invoice.isOverdue && <span className="text-red-600 font-medium ml-1">(Overdue)</span>}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-lg font-bold ${
+                      invoice.isOverdue ? 'text-red-600' : 'text-gray-900'
+                    }`}>
+                      ${invoice.amount.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-blue-700 mt-1">
-                All payment information is encrypted and processed securely. We never store sensitive payment details.
-              </p>
+            );
+          })}
+
+          {filteredInvoices.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p>No invoices found</p>
+            </div>
+          )}
+        </aside>
+
+        {/* RIGHT PANEL */}
+        <main className="flex-1 flex flex-col p-6 space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow flex flex-col flex-1">
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex-1">
+                <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <CreditCardIcon className="h-6 w-6 text-blue-600" /> Payment Terminal
+                </h1>
+                {selectedInvoice ? (
+                  <div className="mt-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
+                    <div className="flex items-center gap-3 mb-3">
+                      <UserIcon className="h-5 w-5 text-gray-500" />
+                      <span className="font-semibold text-lg">{selectedInvoice.patientName}</span>
+                      <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded">
+                        {selectedInvoice.patientId}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedInvoice.type === 'hospital' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {selectedInvoice.type === 'hospital' ? '🏥 Hospital' : '💊 Pharmacy'}
+                      </span>
+                      {selectedInvoice.isOverdue && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                          Overdue
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-1">
+                        <p><span className="font-medium text-gray-600">Invoice ID:</span> {selectedInvoice.id}</p>
+                        <p><span className="font-medium text-gray-600">Service:</span> {selectedInvoice.description}</p>
+                        <p><span className="font-medium text-gray-600">Due Date:</span> {new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        {selectedInvoice.type === 'hospital' && (
+                          <>
+                            <p><span className="font-medium text-gray-600">Department:</span> {selectedInvoice.department}</p>
+                            <p><span className="font-medium text-gray-600">Provider:</span> {selectedInvoice.physician}</p>
+                            {selectedInvoice.services && (
+                              <p><span className="font-medium text-gray-600">Services:</span> {selectedInvoice.services.join(', ')}</p>
+                            )}
+                          </>
+                        )}
+                        {selectedInvoice.type === 'pharmacy' && (
+                          <>
+                            <p><span className="font-medium text-gray-600">Pharmacist:</span> {selectedInvoice.pharmacist}</p>
+                            <p><span className="font-medium text-gray-600">Items:</span> {selectedInvoice.items?.length || 0} items</p>
+                            {selectedInvoice.items && selectedInvoice.items.length > 0 && (
+                              <div className="mt-2">
+                                <p className="font-medium text-gray-600 mb-1">Items:</p>
+                                <div className="max-h-20 overflow-y-auto text-xs space-y-1">
+                                  {selectedInvoice.items.map((item: any, index: number) => (
+                                    <div key={index} className="flex justify-between bg-white p-1 rounded">
+                                      <span>{item.name} x{item.qty}</span>
+                                      <span>${item.price.toFixed(2)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4 text-center text-gray-500 py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                    <CreditCardIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-medium mb-2">Select an invoice to process payment</p>
+                    <p className="text-sm">Choose from hospital or pharmacy invoices on the left</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Process Payment Button */}
-            <button
-              onClick={processPayment}
-              disabled={!selectedInvoice || isProcessing}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
-            >
-              {isProcessing ? (
-                <>
-                  <RefreshCwIcon className="h-4 w-4 animate-spin" />
-                  <span>Processing Payment...</span>
-                </>
-              ) : (
-                <>
-                  <CreditCardIcon className="h-4 w-4" />
-                  <span>Process Payment</span>
-                </>
-              )}
-            </button>
-
-            {paymentResult && !paymentResult.success && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <AlertCircleIcon className="h-5 w-5 text-red-600" />
-                  <span className="text-sm font-medium text-red-900">Payment Failed</span>
+            {/* Payment Input - Only show when invoice is selected */}
+            {selectedInvoice && (
+              <div className="flex flex-col md:flex-row gap-8 flex-1">
+                {/* LEFT: Amount + Keypad */}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    Payment Amount
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      readOnly
+                      value={`$${amountInput || '0.00'}`}
+                      className="text-4xl font-bold w-full border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 pb-2 text-right bg-transparent"
+                    />
+                    <div className="absolute top-0 right-0 text-sm text-gray-500">
+                      Invoice: ${selectedInvoice.amount.toFixed(2)}
+                    </div>
+                  </div>
+                  <POSKeypad onInput={handleKeypadInput} />
                 </div>
-                <p className="text-sm text-red-700 mt-1">{paymentResult.message}</p>
+
+                {/* RIGHT: Payment Method */}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-3">
+                    Payment Method
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <POSMethodButton
+                      icon={CreditCardIcon}
+                      label="Card"
+                      method="credit_card"
+                      active={paymentData.paymentMethod === 'credit_card'}
+                      onSelect={(m) => setPaymentData((p) => ({ ...p, paymentMethod: m }))}
+                    />
+                    <POSMethodButton
+                      icon={DollarSignIcon}
+                      label="Cash"
+                      method="cash"
+                      active={paymentData.paymentMethod === 'cash'}
+                      onSelect={(m) => setPaymentData((p) => ({ ...p, paymentMethod: m }))}
+                    />
+                    <POSMethodButton
+                      icon={ShieldCheckIcon}
+                      label="Insurance"
+                      method="insurance"
+                      active={paymentData.paymentMethod === 'insurance'}
+                      onSelect={(m) => setPaymentData((p) => ({ ...p, paymentMethod: m }))}
+                    />
+                    <POSMethodButton
+                      icon={BanknoteIcon}
+                      label="Check"
+                      method="check"
+                      active={paymentData.paymentMethod === 'check'}
+                      onSelect={(m) => setPaymentData((p) => ({ ...p, paymentMethod: m }))}
+                    />
+                    <POSMethodButton
+                      icon={BuildingIcon}
+                      label="Transfer"
+                      method="bank_transfer"
+                      active={paymentData.paymentMethod === 'bank_transfer'}
+                      onSelect={(m) => setPaymentData((p) => ({ ...p, paymentMethod: m }))}
+                    />
+                  </div>
+
+                  {/* Payment Method Specific Fields */}
+                  {paymentData.paymentMethod === 'insurance' && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Insurance Provider
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter insurance provider"
+                        value={paymentData.insuranceProvider}
+                        onChange={(e) => setPaymentData(p => ({ ...p, insuranceProvider: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
+
+                  {paymentData.paymentMethod === 'check' && (
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Check Number
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter check number"
+                        value={paymentData.checkNumber}
+                        onChange={(e) => setPaymentData(p => ({ ...p, checkNumber: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  <textarea
+                    rows={3}
+                    className="w-full mt-4 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Payment notes (optional)"
+                    value={paymentData.notes}
+                    onChange={(e) =>
+                      setPaymentData((p) => ({ ...p, notes: e.target.value }))
+                    }
+                  />
+
+                  {/* Security Notice */}
+                  <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg text-sm">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <LockIcon className="h-4 w-4 text-blue-600" />
+                      <span className="font-semibold text-blue-900">
+                        Secure {selectedInvoice.type === 'hospital' ? 'Hospital' : 'Pharmacy'} Payment System
+                      </span>
+                    </div>
+                    <p className="text-blue-700">
+                      All transactions are encrypted and compliant with HIPAA & PCI standards.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Bar - Only show when invoice is selected */}
+            {selectedInvoice && (
+              <div className="mt-8 flex justify-between items-center border-t pt-6 bg-gray-50 -mx-6 px-6 rounded-b-xl">
+                <div className="flex items-center gap-8">
+                  <div>
+                    <p className="text-sm text-gray-500">Invoice Total</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ${selectedInvoice.amount.toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Payment Amount</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      ${parseFloat(amountInput || '0').toFixed(2)}
+                    </p>
+                  </div>
+                  {parseFloat(amountInput || '0') !== selectedInvoice.amount && (
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        {parseFloat(amountInput || '0') > selectedInvoice.amount ? 'Change' : 'Remaining'}
+                      </p>
+                      <p className={`text-xl font-bold ${
+                        parseFloat(amountInput || '0') > selectedInvoice.amount ? 'text-green-600' : 'text-orange-600'
+                      }`}>
+                        ${Math.abs(parseFloat(amountInput || '0') - selectedInvoice.amount).toFixed(2)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    onClick={resetForm}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={processPayment}
+                    disabled={!selectedInvoice || isProcessing || !amountInput || parseFloat(amountInput) <= 0}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-semibold flex items-center space-x-2 min-w-[160px] justify-center"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <RefreshCwIcon className="animate-spin h-5 w-5" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCardIcon className="h-5 w-5" />
+                        <span>
+                          {parseFloat(amountInput || '0') >= selectedInvoice.amount 
+                            ? 'Complete Payment' 
+                            : 'Partial Payment'
+                          }
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             )}
           </div>
-        </div>
-      </div>
+        </main>
       </div>
       <Footer />
     </div>

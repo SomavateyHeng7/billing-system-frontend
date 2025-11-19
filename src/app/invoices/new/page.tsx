@@ -14,9 +14,9 @@ import {
   MailIcon,
   CalculatorIcon
 } from 'lucide-react';
-import { Sidebar } from '../../../components/layout/sidebar';
-import { Header } from '@/src/components/shared/header';
-import Footer from '@/src/components/shared/footer';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/shared/header';
+import Footer from '@/components/shared/footer';
 
 // Mock data for patients and services
 const mockPatients = [
@@ -590,6 +590,7 @@ export default function NewInvoice() {
       </div>
       </div>
       </div>
+      <Footer />
     </div>
   );
 }

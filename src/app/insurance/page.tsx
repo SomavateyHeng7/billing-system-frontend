@@ -23,9 +23,9 @@ import {
   Mail
 } from 'lucide-react';
 
-import { Sidebar } from '../../components/layout/sidebar';
-import { Header } from '../../components/shared/header';
-import Footer from '../../components/shared/footer';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/shared/header';
+import Footer from '@/components/shared/footer';
 
 // TypeScript interfaces
 interface InsuranceClaim {
@@ -151,6 +151,7 @@ const mockProviders: InsuranceProvider[] = [
 ];
 
 export default function InsurancePage() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -206,38 +207,43 @@ export default function InsurancePage() {
   const approvedAmount = mockClaims.reduce((sum, claim) => sum + (claim.approvedAmount || 0), 0);
 
   return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center space-x-3">
-                <Shield className="h-8 w-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Insurance Claims Management</h1>
-                  <p className="text-sm text-gray-600">Manage insurance claims, track submissions, and monitor approvals</p>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowNewClaimModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Submit New Claim</span>
-                </button>
-                <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
-                  <Download className="h-4 w-4" />
-                  <span>Export Report</span>
-                </button>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+      />
+      <Header sidebarCollapsed={sidebarCollapsed} />
+      <div className={`transition-all duration-300 p-3 sm:p-4 md:p-6 pt-16 sm:pt-18 md:pt-20 ${
+        sidebarCollapsed ? 'ml-0 sm:ml-14' : 'ml-0 sm:ml-56'
+      }`}>
+        {/* Page Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+            Insurance Claims Management
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+            Manage insurance claims, track submissions, and monitor approvals efficiently
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => setShowNewClaimModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Submit New Claim</span>
+          </button>
+          <button className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-2">
+            <Download className="h-4 w-4" />
+            <span>Export Report</span>
+          </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-lg mb-6">
+          <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex space-x-8">
               {['overview', 'claims', 'providers', 'reports'].map((tab) => (
                 <button
@@ -245,8 +251,8 @@ export default function InsurancePage() {
                   onClick={() => setActiveTab(tab)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
                     activeTab === tab
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   {tab}
@@ -257,78 +263,78 @@ export default function InsurancePage() {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
           {activeTab === 'overview' && (
             <div>
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FileText className="h-6 w-6 text-blue-600" />
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                      <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Total Claims</p>
-                      <p className="text-2xl font-bold text-gray-900">{totalClaims}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Claims</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalClaims}</p>
                     </div>
                   </div>
                   <div className="mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="text-green-600">↗ +5</span>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-green-600 dark:text-green-400">↗ +5</span>
                       <span className="ml-1">this week</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                      <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Approved Claims</p>
-                      <p className="text-2xl font-bold text-gray-900">{approvedClaims}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Approved Claims</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{approvedClaims}</p>
                     </div>
                   </div>
                   <div className="mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="text-green-600">{Math.round((approvedClaims / totalClaims) * 100)}%</span>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-green-600 dark:text-green-400">{Math.round((approvedClaims / totalClaims) * 100)}%</span>
                       <span className="ml-1">approval rate</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <div className="p-2 bg-yellow-100 rounded-lg">
-                      <Clock className="h-6 w-6 text-yellow-600" />
+                    <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                      <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Pending Claims</p>
-                      <p className="text-2xl font-bold text-gray-900">{pendingClaims}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Claims</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingClaims}</p>
                     </div>
                   </div>
                   <div className="mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="text-yellow-600">Avg 6 days</span>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-yellow-600 dark:text-yellow-400">Avg 6 days</span>
                       <span className="ml-1">processing</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <DollarSign className="h-6 w-6 text-green-600" />
+                    <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Approved Amount</p>
-                      <p className="text-2xl font-bold text-gray-900">${approvedAmount.toLocaleString()}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Approved Amount</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">${approvedAmount.toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="text-green-600">${totalClaimAmount.toLocaleString()}</span>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-green-600 dark:text-green-400">${totalClaimAmount.toLocaleString()}</span>
                       <span className="ml-1">total claimed</span>
                     </div>
                   </div>
@@ -336,25 +342,25 @@ export default function InsurancePage() {
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">Recent Claims Activity</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Claims Activity</h3>
                 </div>
                 <div className="p-6">
                   <div className="space-y-4">
                     {mockClaims.slice(0, 3).map((claim) => (
-                      <div key={claim.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                      <div key={claim.id} className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div className="flex-shrink-0">
                           {getStatusIcon(claim.status)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-medium text-gray-900">{claim.patientName}</p>
-                              <p className="text-sm text-gray-500">{claim.id} • {claim.insuranceProvider}</p>
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">{claim.patientName}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{claim.id} • {claim.insuranceProvider}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-medium text-gray-900">${claim.claimAmount.toLocaleString()}</p>
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">${claim.claimAmount.toLocaleString()}</p>
                               <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(claim.status)}`}>
                                 {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
                               </span>
@@ -372,22 +378,22 @@ export default function InsurancePage() {
           {activeTab === 'claims' && (
             <div>
               {/* Search and Filters */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
                 <div className="p-6">
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
-                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
                       <input
                         type="text"
                         placeholder="Search by patient name, claim ID, or insurance provider..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
                     <div className="flex items-center space-x-4">
                       <select
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                       >
@@ -397,8 +403,8 @@ export default function InsurancePage() {
                         <option value="denied">Denied</option>
                         <option value="processing">Processing</option>
                       </select>
-                      <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        <Filter className="h-5 w-5 text-gray-600" />
+                      <button className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <Filter className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </button>
                     </div>
                   </div>
@@ -406,57 +412,57 @@ export default function InsurancePage() {
               </div>
 
               {/* Claims Table */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">Insurance Claims ({filteredClaims.length})</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Insurance Claims ({filteredClaims.length})</h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Patient / Claim ID
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Insurance Provider
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Service Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Claim Amount
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Processing Time
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                       {filteredClaims.map((claim) => (
-                        <tr key={claim.id} className="hover:bg-gray-50">
+                        <tr key={claim.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
-                              <div className="text-sm font-medium text-gray-900">{claim.patientName}</div>
-                              <div className="text-sm text-gray-500">{claim.id}</div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">{claim.patientName}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{claim.id}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{claim.insuranceProvider}</div>
-                            <div className="text-sm text-gray-500">{claim.policyNumber}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">{claim.insuranceProvider}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{claim.policyNumber}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {new Date(claim.serviceDate).toLocaleDateString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">${claim.claimAmount.toLocaleString()}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">${claim.claimAmount.toLocaleString()}</div>
                             {claim.approvedAmount > 0 && (
-                              <div className="text-sm text-green-600">${claim.approvedAmount.toLocaleString()} approved</div>
+                              <div className="text-sm text-green-600 dark:text-green-400">${claim.approvedAmount.toLocaleString()} approved</div>
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -464,22 +470,22 @@ export default function InsurancePage() {
                               {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {claim.processingTime} days
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => setSelectedClaim(claim)}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                 title="View Details"
                               >
                                 <Eye className="h-4 w-4" />
                               </button>
-                              <button className="text-green-600 hover:text-green-900" title="Edit Claim">
+                              <button className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Edit Claim">
                                 <Edit className="h-4 w-4" />
                               </button>
-                              <button className="text-purple-600 hover:text-purple-900" title="Resubmit">
+                              <button className="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300" title="Resubmit">
                                 <Send className="h-4 w-4" />
                               </button>
                             </div>
@@ -497,43 +503,43 @@ export default function InsurancePage() {
             <div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {mockProviders.map((provider) => (
-                  <div key={provider.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <div key={provider.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-medium text-gray-900">{provider.name}</h3>
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">{provider.name}</h3>
+                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded-full">
                         {provider.type}
                       </span>
                     </div>
                     
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
-                        <Phone className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-900">{provider.contactPhone}</span>
+                        <Phone className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                        <span className="text-sm text-gray-900 dark:text-white">{provider.contactPhone}</span>
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <Mail className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-900">{provider.contactEmail}</span>
+                        <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                        <span className="text-sm text-gray-900 dark:text-white">{provider.contactEmail}</span>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 pt-4">
                         <div>
-                          <p className="text-xs text-gray-500">Avg Processing</p>
-                          <p className="text-sm font-medium text-gray-900">{provider.averageProcessingTime} days</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Avg Processing</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{provider.averageProcessingTime} days</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Approval Rate</p>
-                          <p className="text-sm font-medium text-green-600">{provider.approvalRate}%</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Approval Rate</p>
+                          <p className="text-sm font-medium text-green-600 dark:text-green-400">{provider.approvalRate}%</p>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
                       <a
                         href={provider.websitePortal}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full bg-blue-50 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium text-center block"
+                        className="w-full bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors text-sm font-medium text-center block"
                       >
                         Provider Portal
                       </a>
@@ -790,6 +796,11 @@ export default function InsurancePage() {
             </div>
           </div>
         )}
+
+        <div className="mt-8 sm:mt-12">
+          <Footer />
+        </div>
       </div>
+    </div>
   );
 }

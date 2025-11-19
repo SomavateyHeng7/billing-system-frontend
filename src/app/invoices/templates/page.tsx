@@ -24,6 +24,11 @@ import {
   TypeIcon
 } from 'lucide-react';
 
+// Import layout components
+import { Sidebar } from '../../../components/layout/sidebar';
+import { Header } from '../../../components/shared/header';
+import Footer from '../../../components/shared/footer';
+
 // Mock data for invoice templates
 const mockTemplates = [
   {
@@ -138,6 +143,7 @@ interface TemplateFormData {
 }
 
 export default function InvoiceTemplates() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [templates, setTemplates] = useState(mockTemplates);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
@@ -323,80 +329,86 @@ export default function InvoiceTemplates() {
 
   if (showCreateForm) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={resetForm}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <ArrowLeftIcon className="h-6 w-6" />
-                  </button>
-                  <div className="flex items-center space-x-3">
-                    <LayoutTemplateIcon className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <h1 className="text-2xl font-bold text-gray-900">
-                        {editingTemplate ? 'Edit' : 'Create'} Invoice Template
-                      </h1>
-                      <p className="text-sm text-gray-600">Customize invoice layout and branding</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Sidebar 
+          isCollapsed={sidebarCollapsed} 
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+        />
+        <Header sidebarCollapsed={sidebarCollapsed} />
+        <div className={`transition-all duration-300 p-3 sm:p-4 md:p-6 pt-16 sm:pt-18 md:pt-20 ${
+          sidebarCollapsed ? 'ml-0 sm:ml-14' : 'ml-0 sm:ml-56'
+        }`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="py-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={resetForm}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                    >
+                      <ArrowLeftIcon className="h-6 w-6" />
+                    </button>
+                    <div className="flex items-center space-x-3">
+                      <LayoutTemplateIcon className="h-8 w-8 text-blue-600" />
+                      <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {editingTemplate ? 'Edit' : 'Create'} Invoice Template
+                        </h1>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Customize invoice layout and branding</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={resetForm}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveTemplate}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <SaveIcon className="h-4 w-4" />
-                    <span>{editingTemplate ? 'Update' : 'Create'} Template</span>
-                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={resetForm}
+                      className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={saveTemplate}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <SaveIcon className="h-4 w-4" />
+                      <span>{editingTemplate ? 'Update' : 'Create'} Template</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Template Configuration */}
             <div className="lg:col-span-2 space-y-6">
               {/* Basic Information */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Template Information</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Template Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Template Name *
                     </label>
                     <input
                       type="text"
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
+                        errors.name ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
                       }`}
                       placeholder="e.g., Cardiology Invoice"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     />
-                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                    {errors.name && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.name}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Category
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={formData.category}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                     >
@@ -685,51 +697,57 @@ export default function InvoiceTemplates() {
               </div>
             </div>
           </div>
+          
+          <div className="mt-8 sm:mt-12">
+            <Footer />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Link href="/invoices" className="text-blue-600 hover:text-blue-800">
-                  <ArrowLeftIcon className="h-6 w-6" />
-                </Link>
-                <div className="flex items-center space-x-3">
-                  <LayoutTemplateIcon className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Invoice Templates</h1>
-                    <p className="text-sm text-gray-600">Manage and customize invoice templates</p>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-              >
-                <PlusIcon className="h-4 w-4" />
-                <span>New Template</span>
-              </button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+      />
+      <Header sidebarCollapsed={sidebarCollapsed} />
+      <div className={`transition-all duration-300 p-3 sm:p-4 md:p-6 pt-16 sm:pt-18 md:pt-20 ${
+        sidebarCollapsed ? 'ml-0 sm:ml-14' : 'ml-0 sm:ml-56'
+      }`}>
+        {/* Page Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+            Invoice Templates
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+            Create and manage reusable invoice templates for faster billing
+          </p>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Quick Actions */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <Link href="/invoices" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center space-x-2">
+            <ArrowLeftIcon className="h-5 w-5" />
+            <span>Back to Invoices</span>
+          </Link>
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span>New Template</span>
+          </button>
+        </div>
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               {/* Category Filter */}
               <div>
                 <select
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                 >
@@ -744,12 +762,12 @@ export default function InvoiceTemplates() {
                 <input
                   type="text"
                   placeholder="Search templates..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <div className="absolute left-3 top-3">
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
@@ -784,22 +802,22 @@ export default function InvoiceTemplates() {
 
         {/* Templates Grid/List */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredTemplates.map((template) => (
-              <div key={template.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
+              <div key={template.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
                 {/* Template Preview */}
                 <div 
-                  className="h-48 bg-gradient-to-br from-gray-50 to-gray-100 relative"
+                  className="h-40 sm:h-48 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 relative"
                   style={{ 
                     background: `linear-gradient(135deg, ${template.headerColor}20, ${template.accentColor}10)` 
                   }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <FileTextIcon className="h-16 w-16 text-gray-400" />
+                    <FileTextIcon className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-500" />
                   </div>
                   {template.isDefault && (
-                    <div className="absolute top-3 right-3">
-                      <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
+                      <span className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded-full flex items-center space-x-1">
                         <StarIcon className="h-3 w-3" />
                         <span>Default</span>
                       </span>
@@ -813,11 +831,11 @@ export default function InvoiceTemplates() {
                 </div>
 
                 {/* Template Info */}
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate pr-2">{template.name}</h3>
                     <span 
-                      className="px-2 py-1 rounded-full text-xs font-medium"
+                      className="px-2 py-1 rounded-full text-xs font-medium flex-shrink-0"
                       style={{ 
                         backgroundColor: `${template.headerColor}20`, 
                         color: template.headerColor 
@@ -826,7 +844,7 @@ export default function InvoiceTemplates() {
                       {template.category}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{template.description}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 line-clamp-2">{template.description}</p>
                   
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center space-x-1">
@@ -970,8 +988,8 @@ export default function InvoiceTemplates() {
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12">
             <LayoutTemplateIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No templates found</p>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-gray-500 dark:text-gray-400">No templates found</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
               {searchTerm || selectedCategory !== 'All' 
                 ? 'Try adjusting your search or filter criteria'
                 : 'Create your first invoice template to get started'
@@ -979,6 +997,10 @@ export default function InvoiceTemplates() {
             </p>
           </div>
         )}
+
+        <div className="mt-8 sm:mt-12">
+          <Footer />
+        </div>
       </div>
     </div>
   );

@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { DollarSign, FileText, Users, TrendingUp, AlertCircle, Calendar } from 'lucide-react';
-import StatCard from '../components/dashboard/StatCard';
-import QuickActions from '../components/dashboard/QuickActions';
-import RecentInvoices from '../components/dashboard/RecentInvoices';
-import PendingPayments from '../components/dashboard/PendingPayments';
-import Footer from '../components/shared/footer';
-import { Sidebar } from '../components/layout/sidebar';
-import { Header } from '../components/shared/header';
+import StatCard from '@/components/dashboard/StatCard';
+import QuickActions from '@/components/dashboard/QuickActions';
+import RecentInvoices from '@/components/dashboard/RecentInvoices';
+import PendingPayments from '@/components/dashboard/PendingPayments';
+import Footer from '@/components/shared/footer';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/shared/header';
 
 const BillingDashboard: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

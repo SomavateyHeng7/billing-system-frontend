@@ -12,8 +12,9 @@ import {
   ChevronRight,
   Users,
   Shield,
-  CreditCard,
-  DollarSign
+  CreditCard, 
+  DollarSign,
+  ShoppingCart
 } from "lucide-react"
 
 const navigation = [
@@ -22,30 +23,25 @@ const navigation = [
     href: '/', 
     icon: LayoutDashboard 
   },
-  // { 
-  //   name: 'Patients', 
-  //   href: '/patients', 
-  //   icon: Users 
-  // },
+  { 
+    name: 'POS', 
+    href: '/pos', 
+    icon: ShoppingCart 
+  },
   { 
     name: 'Invoices', 
     href: '/invoices', 
     icon: FileText 
   },
-  { 
-    name: 'Payments', 
-    href: '/payments', 
-    icon: CreditCard 
-  },
+  // { 
+  //   name: 'Payments', 
+  //   href: '/payments', 
+  //   icon: CreditCard 
+  // },
   { 
     name: 'Insurance', 
     href: '/insurance', 
     icon: Shield 
-  },
-  { 
-    name: 'Reports', 
-    href: '/reports', 
-    icon: BarChart3 
   },
   { 
     name: 'Revenue', 

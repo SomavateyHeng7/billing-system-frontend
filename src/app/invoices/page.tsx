@@ -183,42 +183,38 @@ export default function InvoicesPage() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
       />
       <Header sidebarCollapsed={sidebarCollapsed} />
-      <div className={`transition-all duration-300 pt-20 ${sidebarCollapsed ? 'ml-14' : 'ml-56'}`}>
-        {/* Header */}
-        <div className=" dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <ReceiptIcon className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoice Management</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Create, track, and manage patient invoices and payments</p>
-                  </div>
-                </div>
-                <div className="flex space-x-3">
-                  <Link 
-                    href="/invoices/recurring"
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                    <span>Recurring Billing</span>
-                  </Link>
-                  <Link 
-                    href="/invoices/new" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <PlusIcon className="h-5 w-5" />
-                    <span>New Invoice</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className={`transition-all duration-300 p-3 sm:p-4 md:p-6 pt-16 sm:pt-18 md:pt-20 ${
+        sidebarCollapsed ? 'ml-0 sm:ml-14' : 'ml-0 sm:ml-56'
+      }`}>
+        {/* Page Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+            Invoice Management
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+            Create, manage, and track all your hospital invoices and billing statements
+          </p>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Statistics Cards */}
+        {/* Quick Actions */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-3">
+          <Link 
+            href="/invoices/recurring"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+          >
+            <CalendarIcon className="h-4 w-4" />
+            <span>Recurring Billing</span>
+          </Link>
+          <Link 
+            href="/invoices/new" 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+          >
+            <PlusIcon className="h-5 w-5" />
+            <span>New Invoice</span>
+          </Link>
+        </div>
+
+        {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
@@ -434,9 +430,11 @@ export default function InvoicesPage() {
             </table>
           </div>
         </div>
+        {/* Footer */}
+        <div className="mt-8 sm:mt-12">
+          <Footer />
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
